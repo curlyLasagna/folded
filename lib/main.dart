@@ -3,6 +3,8 @@ import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
+void main() => runApp(MaterialApp(home: HelloWorldPage()));
+
 class HelloWorldPage extends StatefulWidget {
   @override
   _HelloWorldPagState createState() => _HelloWorldPagState();
