@@ -3,14 +3,14 @@ import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-class TShirt extends StatefulWidget {
-  const TShirt({super.key});
+class TShirtPage extends StatefulWidget {
+  const TShirtPage({super.key});
 
   @override
   _TshirtState createState() => _TshirtState();
 }
 
-class _TshirtState extends State<TShirt> {
+class _TshirtState extends State<TShirtPage> {
   late ARKitController arkitController;
   ARKitPlane? plane;
   ARKitNode? node;
@@ -25,23 +25,30 @@ class _TshirtState extends State<TShirt> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-      ),
-      body: Container(
-        child: ARKitSceneView(
-          showFeaturePoints: true,
-          planeDetection: ARPlaneDetection.horizontal,
-          onARKitViewCreated: onARKitViewCreated,
-          environmentTexturing:
-              ARWorldTrackingConfigurationEnvironmentTexturing.automatic,
+        automaticallyImplyLeading: false,
+        leadingWidth: 100,
+        leading: ElevatedButton.icon(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_left_sharp),
+          label: const Text('Back'),
+          style: ElevatedButton.styleFrom(
+              elevation: 0, primary: Colors.transparent),
         ),
+      ),
+      body: ARKitSceneView(
+        // showFeaturePoints: true,
+        planeDetection: ARPlaneDetection.horizontal,
+        onARKitViewCreated: onARKitViewCreated,
+        environmentTexturing:
+            ARWorldTrackingConfigurationEnvironmentTexturing.automatic,
       ));
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
     this.arkitController.add(_createText());
     this.arkitController.add(_createLine());
+    this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
+    this.arkitController.onUpdateNodeForAnchor = _handleUpdateAnchor;
   }
 
   ARKitNode _createLine() => ARKitNode(
@@ -84,22 +91,8 @@ class _TshirtState extends State<TShirt> {
     );
   }
 
-  final _rnd = math.Random();
-  List<ARKitMaterial> _createRandomColorMaterial() {
-    return [
-      ARKitMaterial(
-        lightingModelName: ARKitLightingModel.physicallyBased,
-        metalness: ARKitMaterialProperty.value(10),
-        roughness: ARKitMaterialProperty.value(_rnd.nextDouble()),
-        diffuse: ARKitMaterialProperty.color(
-          Color((0xFFFFFF).toInt() << 0).withOpacity(1.0),
-        ),
-      )
-    ];
-  }
-
   void _handleAddAnchor(ARKitAnchor anchor) {
-    if (!(anchor is ARKitPlaneAnchor)) {
+    if (anchor is! ARKitPlaneAnchor) {
       return;
     }
     _addPlane(arkitController, anchor);
@@ -121,16 +114,31 @@ class _TshirtState extends State<TShirt> {
       height: anchor.extent.z,
       materials: [
         ARKitMaterial(
-          transparency: 0.5,
+          transparency: 0.05,
           diffuse: ARKitMaterialProperty.color(Colors.white),
         )
       ],
     );
     node = ARKitNode(
-      geometry: plane,
+      geometry: ARKitText(text: "Hello", extrusionDepth: 0),
       position: vector.Vector3(anchor.center.x, 0, anchor.center.z),
       rotation: vector.Vector4(1, 0, 0, -math.pi / 2),
     );
     controller.add(node!, parentNodeName: anchor.nodeName);
   }
+}
+
+// Color and texture of objects
+final _rnd = math.Random();
+List<ARKitMaterial> _createRandomColorMaterial() {
+  return [
+    ARKitMaterial(
+      lightingModelName: ARKitLightingModel.physicallyBased,
+      metalness: ARKitMaterialProperty.value(10),
+      roughness: ARKitMaterialProperty.value(_rnd.nextDouble()),
+      diffuse: ARKitMaterialProperty.color(
+        Color((0xFFFFFF).toInt() << 0).withOpacity(1.0),
+      ),
+    )
+  ];
 }
