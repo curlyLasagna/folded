@@ -31,8 +31,7 @@ class _TshirtState extends State<TShirtPage> {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_left_sharp),
           label: const Text('Back'),
-          style: ElevatedButton.styleFrom(
-              elevation: 0, primary: Colors.transparent),
+          style: ElevatedButton.styleFrom(elevation: 0),
         ),
       ),
       body: ARKitSceneView(
@@ -45,17 +44,11 @@ class _TshirtState extends State<TShirtPage> {
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
-    this.arkitController.add(_createText());
-    this.arkitController.add(_createLine());
+    // arkitController.addCoachingOverlay(CoachingOverlayGoal.horizontalPlane);
+    // arkitController.onAddNodeForAnchor = _handleAddAnchor;
     this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
     this.arkitController.onUpdateNodeForAnchor = _handleUpdateAnchor;
   }
-
-  ARKitNode _createLine() => ARKitNode(
-      geometry: ARKitCylinder(
-          materials: _createRandomColorMaterial(), radius: 0.03, height: 0.09),
-      rotation: vector.Vector4(0.04, 0.1, 0.4, -0.5),
-      position: vector.Vector3(-0.1, -0.1, -0.5));
 
   ARKitNode _createPlane() {
     final plane = ARKitPlane(
@@ -71,23 +64,6 @@ class _TshirtState extends State<TShirtPage> {
     return ARKitNode(
       geometry: plane,
       position: vector.Vector3(0, 0, -1.5),
-    );
-  }
-
-  ARKitNode _createText() {
-    final text = ARKitText(
-      text: 'Fold here',
-      extrusionDepth: 1,
-      materials: [
-        ARKitMaterial(
-          diffuse: ARKitMaterialProperty.color(Colors.blue),
-        )
-      ],
-    );
-    return ARKitNode(
-      geometry: text,
-      position: vector.Vector3(-0.3, 0.3, -1.4),
-      scale: vector.Vector3(0.02, 0.02, 0.02),
     );
   }
 
@@ -114,31 +90,26 @@ class _TshirtState extends State<TShirtPage> {
       height: anchor.extent.z,
       materials: [
         ARKitMaterial(
-          transparency: 0.05,
+          transparency: 0.5,
           diffuse: ARKitMaterialProperty.color(Colors.white),
         )
       ],
     );
+
     node = ARKitNode(
-      geometry: ARKitText(text: "Hello", extrusionDepth: 0),
+      geometry: ARKitPlane(
+        width: 0.01,
+        height: 0.5,
+        materials: [
+          ARKitMaterial(
+            transparency: 1.0,
+            diffuse: ARKitMaterialProperty.color(Colors.white),
+          )
+        ],
+      ),
       position: vector.Vector3(anchor.center.x, 0, anchor.center.z),
       rotation: vector.Vector4(1, 0, 0, -math.pi / 2),
     );
     controller.add(node!, parentNodeName: anchor.nodeName);
   }
-}
-
-// Color and texture of objects
-final _rnd = math.Random();
-List<ARKitMaterial> _createRandomColorMaterial() {
-  return [
-    ARKitMaterial(
-      lightingModelName: ARKitLightingModel.physicallyBased,
-      metalness: ARKitMaterialProperty.value(10),
-      roughness: ARKitMaterialProperty.value(_rnd.nextDouble()),
-      diffuse: ARKitMaterialProperty.color(
-        Color((0xFFFFFF).toInt() << 0).withOpacity(1.0),
-      ),
-    )
-  ];
 }
