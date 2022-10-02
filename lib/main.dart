@@ -19,16 +19,16 @@ class FirstRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff085F63),
+      backgroundColor: const Color(0xff1c1c1c),
       appBar: AppBar(
         title: const Text('Folded'),
-        backgroundColor: const Color(0xffC3CCE1),
+        backgroundColor: const Color(0xff858585),
       ),
       body: Center(
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(10),
-              backgroundColor: const Color(0xffC3CCE1)),
+              backgroundColor: const Color(0xff858585)),
           child: const Text('👕 T-shirt'),
           onPressed: () {
             Navigator.push(
